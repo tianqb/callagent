@@ -1,0 +1,3 @@
+agently>=0.1.0
+sqlite3
+uuid
