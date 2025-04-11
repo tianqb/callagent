@@ -14,7 +14,7 @@ class TaskPlanner:
     Task planner that manages task planning, decomposition, and assignment.
     """
 
-    def __init__(self, agent_hub, db_path):
+    def __init__(self, agent_hub):
         """
         Initialize the task planner.
 
@@ -23,8 +23,7 @@ class TaskPlanner:
             db_path (str): Path to the SQLite database file.
         """
         self.agent_hub = agent_hub
-        self.db_path = db_path
-        self.db_manager = DatabaseManager(db_path)
+        self.db_manager = DatabaseManager()
         self.tasks = {}
 
     def create_task(self, task_description, creator_id="system"):

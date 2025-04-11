@@ -7,25 +7,26 @@ import sqlite3
 import json
 import os
 from pathlib import Path
-
+from app.config import DATABASE_PATH
 
 class DatabaseManager:
     """
     Manages SQLite database operations for the CallAgent project.
     """
 
-    def __init__(self, db_path):
+    def __init__(self):
         """
         Initialize the database manager.
 
         Args:
-            db_path (str): Path to the SQLite database file.
+            
         """
-        self.db_path = db_path
+
         # Create directory if it doesn't exist
-        db_dir = os.path.dirname(db_path)
+        db_dir = os.path.dirname(DATABASE_PATH)
         if db_dir and not os.path.exists(db_dir):
             os.makedirs(db_dir)
+        self.db_path = DATABASE_PATH
 
     def init_db(self):
         """

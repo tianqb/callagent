@@ -5,17 +5,17 @@ Base agent implementation for the CallAgent project.
 import uuid
 import json
 import time
-from ..memory.short_term import ShortTermMemory
-from ..memory.long_term import LongTermMemory
-from ..config import SHORT_TERM_MEMORY_TTL
+from app.memory.short_term import ShortTermMemory
+from app.memory.long_term import LongTermMemory
+from app.config import SHORT_TERM_MEMORY_TTL,DATABASE_PATH
 
 
-class BaseAgent:
+class BaseAgent(object):
     """
     Base agent class that provides common functionality for all agents.
     """
 
-    def __init__(self, agent_id=None, name=None, db_path=None):
+    def __init__(self, agent_id=None, name=None):
         """
         Initialize the base agent.
 
@@ -26,9 +26,8 @@ class BaseAgent:
         """
         self.agent_id = agent_id or f"agent_{uuid.uuid4().hex[:8]}"
         self.name = name or f"Agent-{self.agent_id}"
-        self.db_path = db_path
-        self.short_term_memory = ShortTermMemory()
-        self.long_term_memory = LongTermMemory(db_path) if db_path else None
+        self.short_term_memory = ShortTermMemory(cleanup_interval = SHORT_TERM_MEMORY_TTL)
+        self.long_term_memory = LongTermMemory()
         self.created_at = time.time()
 
     def send_message(self, recipient_id, message):

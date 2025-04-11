@@ -1,7 +1,10 @@
 """
 Example usage of the CallAgent project.
 """
-
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
 import time
 from app.config import DATABASE_PATH
 from app.database.db_manager import DatabaseManager
@@ -21,13 +24,12 @@ def main():
     logger.info("Starting CallAgent Example")
     
     # Set up the database
-    db_path = DATABASE_PATH
-    db_manager = DatabaseManager(db_path)
+    db_manager = DatabaseManager()
     db_manager.init_db()
-    logger.info(f"Database set up at {db_path}")
+    logger.info(f"Database set up at {DATABASE_PATH}")
     
     # Create agents
-    agent_factory = AgentFactory(db_path)
+    agent_factory = AgentFactory()
     
     # Create a research agent
     research_agent = agent_factory.create_research_agent(
@@ -56,7 +58,7 @@ def main():
     logger.info(f"Created critic agent: {critic_agent.agent_id}")
     
     # Set up the agent hub
-    agent_hub = AgentHub(db_path)
+    agent_hub = AgentHub()
     
     # Register agents with the hub
     agent_hub.register_agent(research_agent)
@@ -77,11 +79,11 @@ def main():
     critic_agent.send_message = create_send_message_wrapper(critic_agent.agent_id)
     
     # Set up the task planner
-    task_planner = TaskPlanner(agent_hub, db_path)
+    task_planner = TaskPlanner(agent_hub)
     logger.info("Task planner set up")
     
     # Set up the plan executor
-    plan_executor = PlanExecutor(agent_hub, db_path)
+    plan_executor = PlanExecutor(agent_hub)
     logger.info("Plan executor set up")
     
     # Example 1: Direct agent communication

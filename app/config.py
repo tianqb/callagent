@@ -3,7 +3,7 @@ Configuration settings for the CallAgent project.
 """
 
 # Database configuration
-DATABASE_PATH = "call_agent.db"
+DATABASE_PATH = "resources/call_agent.db"
 
 # Memory configuration
 SHORT_TERM_MEMORY_TTL = 3600  # 1 hour in seconds
@@ -16,4 +16,4 @@ DEFAULT_AGENT_SETTINGS = {
 
 # Logging configuration
 LOG_LEVEL = "INFO"
-LOG_FILE = "call_agent.log"
+LOG_FILE = "logs/call_agent.log"

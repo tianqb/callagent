@@ -14,15 +14,14 @@ class LongTermMemory:
     Long-term memory implementation that stores data in SQLite database.
     """
 
-    def __init__(self, db_path):
+    def __init__(self):
         """
         Initialize the long-term memory.
 
         Args:
             db_path (str): Path to the SQLite database file.
         """
-        self.db_manager = DatabaseManager(db_path)
-        self.db_path = db_path
+        self.db_manager = DatabaseManager()
         self.init_db()
 
     def init_db(self):

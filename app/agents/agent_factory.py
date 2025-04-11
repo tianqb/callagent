@@ -4,9 +4,13 @@ Creates and manages different types of agents.
 """
 
 import uuid
-from .base_agent import BaseAgent
-from .specialized_agent import ResearchAgent, PlanningAgent, ExecutionAgent, CriticAgent
-from ..config import DATABASE_PATH
+from app.agents.base import BaseAgent
+from app.agents.research import ResearchAgent
+from app.agents.planning import PlanningAgent
+from app.agents.execution import ExecutionAgent
+from app.agents.critic import CriticAgent
+
+from app.config import DATABASE_PATH
 
 
 class AgentFactory:
@@ -14,14 +18,13 @@ class AgentFactory:
     Factory class for creating and managing agents.
     """
 
-    def __init__(self, db_path=None):
+    def __init__(self):
         """
         Initialize the agent factory.
 
         Args:
             db_path (str, optional): Path to the SQLite database file.
         """
-        self.db_path = db_path or DATABASE_PATH
         self.agents = {}
 
     def create_agent(self, agent_type, agent_id=None, name=None, **kwargs):
@@ -44,15 +47,15 @@ class AgentFactory:
             agent_id = f"agent_{uuid.uuid4().hex[:8]}"
 
         if agent_type == 'base':
-            agent = BaseAgent(agent_id=agent_id, name=name, db_path=self.db_path, **kwargs)
+            agent = BaseAgent(agent_id=agent_id, name=name, **kwargs)
         elif agent_type == 'research':
-            agent = ResearchAgent(agent_id=agent_id, name=name, db_path=self.db_path, **kwargs)
+            agent = ResearchAgent(agent_id=agent_id, name=name, **kwargs)
         elif agent_type == 'planning':
-            agent = PlanningAgent(agent_id=agent_id, name=name, db_path=self.db_path, **kwargs)
+            agent = PlanningAgent(agent_id=agent_id, name=name, **kwargs)
         elif agent_type == 'execution':
-            agent = ExecutionAgent(agent_id=agent_id, name=name, db_path=self.db_path, **kwargs)
+            agent = ExecutionAgent(agent_id=agent_id, name=name, **kwargs)
         elif agent_type == 'critic':
-            agent = CriticAgent(agent_id=agent_id, name=name, db_path=self.db_path, **kwargs)
+            agent = CriticAgent(agent_id=agent_id, name=name, **kwargs)
         else:
             raise ValueError(f"Unsupported agent type: {agent_type}")
 

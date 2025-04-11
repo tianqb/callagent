@@ -14,7 +14,7 @@ class AgentHub:
     Agent Hub manages communication between agents.
     """
 
-    def __init__(self, db_path):
+    def __init__(self):
         """
         Initialize the Agent Hub.
 
@@ -22,8 +22,7 @@ class AgentHub:
             db_path (str): Path to the SQLite database file.
         """
         self.agents = {}
-        self.db_path = db_path
-        self.db_manager = DatabaseManager(db_path)
+        self.db_manager = DatabaseManager()
 
     def register_agent(self, agent):
         """

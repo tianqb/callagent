@@ -13,15 +13,14 @@ class ConversationManager:
     Manages conversations between agents.
     """
 
-    def __init__(self, db_path):
+    def __init__(self):
         """
         Initialize the conversation manager.
 
         Args:
             db_path (str): Path to the SQLite database file.
         """
-        self.db_path = db_path
-        self.db_manager = DatabaseManager(db_path)
+        self.db_manager = DatabaseManager()
 
     def record_conversation(self, sender_id, recipient_id, message):
         """

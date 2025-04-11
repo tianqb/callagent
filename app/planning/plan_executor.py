@@ -13,7 +13,7 @@ class PlanExecutor:
     Plan executor that executes plans created by the task planner.
     """
 
-    def __init__(self, agent_hub, db_path):
+    def __init__(self, agent_hub):
         """
         Initialize the plan executor.
 
@@ -22,8 +22,7 @@ class PlanExecutor:
             db_path (str): Path to the SQLite database file.
         """
         self.agent_hub = agent_hub
-        self.db_path = db_path
-        self.db_manager = DatabaseManager(db_path)
+        self.db_manager = DatabaseManager()
         self.executions = {}
 
     def execute_plan(self, plan_id, plan_content, agent_id=None):
