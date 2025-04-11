@@ -1,0 +1,20 @@
+# Global LLM configuration
+[deepseek]
+model = "deepseek-chat"                                 # The LLM model to use
+base_url = "https://api.deepseek.com/v1/"               # API endpoint URL
+api_key = "Your api key"                                # Your API key                                    
+temperature = 0.7                                       # Controls randomness
+
+## Sandbox configuration
+#[sandbox]
+#use_sandbox = false
+#image = "python:3.12-slim"
+#work_dir = "/workspace"
+#memory_limit = "1g"  # 512m
+#cpu_limit = 2.0
+#timeout = 300
+#network_enabled = true
+
+## Memory configuration
+#[memory]
+short_term_memory_ttl = 3600  # 1 hour in seconds

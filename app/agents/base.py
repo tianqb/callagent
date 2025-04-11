@@ -7,7 +7,7 @@ import json
 import time
 from app.memory.short_term import ShortTermMemory
 from app.memory.long_term import LongTermMemory
-from app.config import SHORT_TERM_MEMORY_TTL,DATABASE_PATH
+from app.config import SHORT_TERM_TTL,DATABASE_PATH,DEEPSEEK_MODEL,DEEPSEEK_BASE_URL,DEEPSEEK_API_KEY
 from pydantic import Field
 from Agently.Agent.Agent import Agent
 from Agently.utils import PluginManager, ToolManager, RuntimeCtx
@@ -32,15 +32,15 @@ class BaseAgent(Agent):
         ## 将默认模型请求客户端设置为OAIClient（我们为OpenAI兼容格式定制的请求客户端）
         self.set_settings("current_model", "OAIClient")
         ## 提供你的模型API-KEY
-        self.set_settings("model.OAIClient.auth", { "api_key": "sk-13f4c2da5c71423c814cac3dcfdf9262" })
+        self.set_settings("model.OAIClient.auth", { "api_key": DEEPSEEK_API_KEY })
         ## 指定你的模型Base-URL，如DeepSeek
-        self.set_settings("model.OAIClient.url", "https://api.deepseek.com/")
+        self.set_settings("model.OAIClient.url", DEEPSEEK_BASE_URL)
         ## 指定你想要调用的具体模型
-        self.set_settings("model.OAIClient.options", { "model": "deepseek-chat" })
+        self.set_settings("model.OAIClient.options", { "model": DEEPSEEK_MODEL})
         
         self.agent_id: str = agent_id or f"agent_{uuid.uuid4().hex[:8]}"
         self.name: str = name or f"Agent-{self.agent_id}"
-        self.short_term_memory = ShortTermMemory(cleanup_interval = SHORT_TERM_MEMORY_TTL)
+        self.short_term_memory = ShortTermMemory(cleanup_interval = SHORT_TERM_TTL)
         self.long_term_memory = LongTermMemory()
         self.created_at: float = time.time()
 
