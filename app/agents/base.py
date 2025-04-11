@@ -8,14 +8,17 @@ import time
 from app.memory.short_term import ShortTermMemory
 from app.memory.long_term import LongTermMemory
 from app.config import SHORT_TERM_MEMORY_TTL,DATABASE_PATH
+from pydantic import Field
+from Agently.Agent.Agent import Agent
+from Agently.utils import PluginManager, ToolManager, RuntimeCtx
+from Agently._global import global_plugin_manager, global_storage, global_settings, global_tool_manager
 
-
-class BaseAgent(object):
+class BaseAgent(Agent):
     """
     Base agent class that provides common functionality for all agents.
     """
 
-    def __init__(self, agent_id=None, name=None):
+    def __init__(self, agent_id: str=None, name: str=None, auto_save :bool=False, is_debug :bool=False):       
         """
         Initialize the base agent.
 
@@ -24,11 +27,22 @@ class BaseAgent(object):
             name (str, optional): Name of the agent. If None, a default name is used.
             db_path (str, optional): Path to the SQLite database file.
         """
-        self.agent_id = agent_id or f"agent_{uuid.uuid4().hex[:8]}"
-        self.name = name or f"Agent-{self.agent_id}"
+        super().__init__(agent_id=agent_id, auto_save=auto_save, parent_agent_runtime_ctx=RuntimeCtx(), parent_tool_manager=ToolManager(parent = global_tool_manager), global_storage=global_storage, parent_plugin_manager=PluginManager(parent = global_plugin_manager), parent_settings=RuntimeCtx(parent = global_settings), is_debug=is_debug)
+        #####设置模型相关参数######
+        ## 将默认模型请求客户端设置为OAIClient（我们为OpenAI兼容格式定制的请求客户端）
+        self.set_settings("current_model", "OAIClient")
+        ## 提供你的模型API-KEY
+        self.set_settings("model.OAIClient.auth", { "api_key": "sk-13f4c2da5c71423c814cac3dcfdf9262" })
+        ## 指定你的模型Base-URL，如DeepSeek
+        self.set_settings("model.OAIClient.url", "https://api.deepseek.com/")
+        ## 指定你想要调用的具体模型
+        self.set_settings("model.OAIClient.options", { "model": "deepseek-chat" })
+        
+        self.agent_id: str = agent_id or f"agent_{uuid.uuid4().hex[:8]}"
+        self.name: str = name or f"Agent-{self.agent_id}"
         self.short_term_memory = ShortTermMemory(cleanup_interval = SHORT_TERM_MEMORY_TTL)
         self.long_term_memory = LongTermMemory()
-        self.created_at = time.time()
+        self.created_at: float = time.time()
 
     def send_message(self, recipient_id, message):
         """
@@ -139,7 +153,7 @@ class BaseAgent(object):
                     "timestamp": time.time()
                 }
             )
-
+        
         return thoughts
 
     def plan(self, task):

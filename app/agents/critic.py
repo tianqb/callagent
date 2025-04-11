@@ -6,7 +6,7 @@ class CriticAgent(BaseAgent):
     Critic agent that specializes in evaluating and providing feedback.
     """
 
-    def __init__(self, agent_id=None, name=None):
+    def __init__(self, agent_id=None, name=None, auto_save=False, is_debug=False):
         """
         Initialize the critic agent.
 
@@ -15,9 +15,10 @@ class CriticAgent(BaseAgent):
             name (str, optional): Name of the agent. If None, a default name is used.
             db_path (str, optional): Path to the SQLite database file.
         """
-        super().__init__(agent_id, name or "Critic Agent")
+        super().__init__(agent_id, name or "Critic Agent", auto_save, is_debug)
         self.agent_type = "critic"
         self.evaluations = {}
+        
 
     def process_message(self, sender_id, message):
         """

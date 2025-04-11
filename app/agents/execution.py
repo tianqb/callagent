@@ -6,7 +6,7 @@ class ExecutionAgent(BaseAgent):
     Execution agent that specializes in executing tasks.
     """
 
-    def __init__(self, agent_id=None, name=None, skills=None):
+    def __init__(self, agent_id=None, name=None, auto_save=False, is_debug=False, skills=None):
         """
         Initialize the execution agent.
 
@@ -16,7 +16,7 @@ class ExecutionAgent(BaseAgent):
             db_path (str, optional): Path to the SQLite database file.
             skills (list, optional): List of skills.
         """
-        super().__init__(agent_id, name or "Execution Agent")
+        super().__init__(agent_id, name or "Execution Agent", auto_save, is_debug)
         self.agent_type = "execution"
         self.skills = skills or ["general execution"]
         self.current_tasks = {}

@@ -1,12 +1,12 @@
 from app.agents.base import BaseAgent
 import time
-
+from app.utils.constant import AgentType
 class ResearchAgent(BaseAgent):
     """
     Research agent that specializes in gathering and analyzing information.
     """
 
-    def __init__(self, agent_id=None, name=None, expertise=None):
+    def __init__(self, agent_id=None, name=None, auto_save=False, is_debug=False, expertise=None):
         """
         Initialize the research agent.
 
@@ -16,7 +16,7 @@ class ResearchAgent(BaseAgent):
             db_path (str, optional): Path to the SQLite database file.
             expertise (list, optional): List of areas of expertise.
         """
-        super().__init__(agent_id, name or "Research Agent")
+        super().__init__(agent_id, name or "Research Agent", auto_save, is_debug)
         self.expertise = expertise or ["general research"]
         self.agent_type = "research"
 
@@ -73,8 +73,46 @@ class ResearchAgent(BaseAgent):
                     "timestamp": time.time()
                 }
             )
-
-        return thoughts
+        result = (
+            self.general("输出规定", "必须使用中文进行输出")
+                # role: agent自身的角色设定信息
+                .role({
+                    "姓名": "Research",
+                    "任务": "使用自己的知识为用户解答常见问题",
+                })
+                # user_info: agent需要了解的用户相关的信息
+                #.user_info("和你对话的用户是一个只具有Python编程基础知识的入门初学者")
+                # abstract: 对于之前对话（尤其是较长对话）的总结信息
+                .abstract(None)
+                # chat_history: 按照OpenAI消息列格式的对话记录list
+                ## 支持:
+                ## [{ "role": "system", "content": "" },
+                ##  { "role": "assistant", "content": "" },
+                ##  { "role": "user", "content": "" }]
+                ## 三种角色
+                .chat_history([])
+                # input: 和本次请求相关的输入信息
+                .input({
+                    "question": context,
+                    "reply_style_expect": "请用自然语言进行回复"
+                })
+                # instruct: 为本次请求提供的行动指导信息
+                .instruct([
+                    "请使用{reply_style_expect}的回复风格，结合{thoughts}内容回复{question}提出的问题",
+                ])
+                # output: 对本次请求的输出提出格式和内容的要求
+                .output({
+                    "reply": ("str", "对{question}的直接回复"),
+                    "next_question": ([
+                        ("str",
+                        "根据{reply}内容，结合{user_info}提供的用户信息，" +
+                        "总结意见建议后发送其他智能体"
+                        )], "1个"),
+                })
+                # start: 用于开始本次主要交互请求
+                .start()
+        )
+        return result
 
     def research_topic(self, topic):
         """

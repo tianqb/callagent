@@ -9,7 +9,7 @@ from app.agents.research import ResearchAgent
 from app.agents.planning import PlanningAgent
 from app.agents.execution import ExecutionAgent
 from app.agents.critic import CriticAgent
-
+from app.utils.constant import AgentType,AGENT_TYPE_VALUES
 from app.config import DATABASE_PATH
 
 
@@ -27,7 +27,7 @@ class AgentFactory:
         """
         self.agents = {}
 
-    def create_agent(self, agent_type, agent_id=None, name=None, **kwargs):
+    def create_agent(self, agent_type, agent_id :str= None, name :str=None,auto_save :bool=False, is_debug :bool=False, **kwargs):
         """
         Create an agent of the specified type.
 
@@ -46,16 +46,16 @@ class AgentFactory:
         if agent_id is None:
             agent_id = f"agent_{uuid.uuid4().hex[:8]}"
 
-        if agent_type == 'base':
-            agent = BaseAgent(agent_id=agent_id, name=name, **kwargs)
-        elif agent_type == 'research':
-            agent = ResearchAgent(agent_id=agent_id, name=name, **kwargs)
-        elif agent_type == 'planning':
-            agent = PlanningAgent(agent_id=agent_id, name=name, **kwargs)
-        elif agent_type == 'execution':
-            agent = ExecutionAgent(agent_id=agent_id, name=name, **kwargs)
-        elif agent_type == 'critic':
-            agent = CriticAgent(agent_id=agent_id, name=name, **kwargs)
+        if agent_type == AgentType.BASE:
+            agent = BaseAgent(agent_id=agent_id, name=name, auto_save=auto_save, is_debug=is_debug, **kwargs)
+        elif agent_type == AgentType.RESEARCH:
+            agent = ResearchAgent(agent_id=agent_id, name=name, auto_save=auto_save, is_debug=is_debug, **kwargs)
+        elif agent_type == AgentType.PLANNING:
+            agent = PlanningAgent(agent_id=agent_id, name=name, auto_save=auto_save, is_debug=is_debug, **kwargs)
+        elif agent_type == AgentType.EXECUTION:
+            agent = ExecutionAgent(agent_id=agent_id, name=name, auto_save=auto_save, is_debug=is_debug, **kwargs)
+        elif agent_type == AgentType.CRITIC:
+            agent = CriticAgent(agent_id=agent_id, name=name, auto_save=auto_save, is_debug=is_debug, **kwargs)
         else:
             raise ValueError(f"Unsupported agent type: {agent_type}")
 
@@ -110,7 +110,7 @@ class AgentFactory:
             dict: Dictionary of agent_id -> agent for the created team.
         """
         if agent_types is None:
-            agent_types = ['research', 'planning', 'execution', 'critic']
+            agent_types = AGENT_TYPE_VALUES
 
         team = {}
         for i, agent_type in enumerate(agent_types):
@@ -139,7 +139,7 @@ class AgentFactory:
 
         return team
 
-    def create_research_agent(self, name=None, expertise=None):
+    def create_research_agent(self, name=None, auto_save=False, is_debug=False, expertise=None):
         """
         Create a research agent.
 
@@ -150,9 +150,9 @@ class AgentFactory:
         Returns:
             ResearchAgent: The created agent.
         """
-        return self.create_agent('research', name=name, expertise=expertise)
+        return self.create_agent('research', name=name, auto_save=auto_save, is_debug=is_debug, expertise=expertise)
 
-    def create_planning_agent(self, name=None):
+    def create_planning_agent(self, name=None, auto_save=False, is_debug=False):
         """
         Create a planning agent.
 
@@ -162,9 +162,9 @@ class AgentFactory:
         Returns:
             PlanningAgent: The created agent.
         """
-        return self.create_agent('planning', name=name)
+        return self.create_agent('planning', name=name, auto_save=auto_save, is_debug=is_debug)
 
-    def create_execution_agent(self, name=None, skills=None):
+    def create_execution_agent(self, name=None, auto_save=False, is_debug=False, skills=None):
         """
         Create an execution agent.
 
@@ -175,9 +175,9 @@ class AgentFactory:
         Returns:
             ExecutionAgent: The created agent.
         """
-        return self.create_agent('execution', name=name, skills=skills)
+        return self.create_agent('execution', name=name, auto_save=auto_save, is_debug=is_debug, skills=skills)
 
-    def create_critic_agent(self, name=None):
+    def create_critic_agent(self, name=None, auto_save=False, is_debug=False):
         """
         Create a critic agent.
 
@@ -187,4 +187,4 @@ class AgentFactory:
         Returns:
             CriticAgent: The created agent.
         """
-        return self.create_agent('critic', name=name)
+        return self.create_agent('critic', name=name, auto_save=auto_save, is_debug=is_debug)

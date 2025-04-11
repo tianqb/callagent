@@ -6,7 +6,7 @@ class PlanningAgent(BaseAgent):
     Planning agent that specializes in task planning and coordination.
     """
 
-    def __init__(self, agent_id=None, name=None):
+    def __init__(self, agent_id=None, name=None, auto_save=False, is_debug=False):
         """
         Initialize the planning agent.
 
@@ -15,7 +15,7 @@ class PlanningAgent(BaseAgent):
             name (str, optional): Name of the agent. If None, a default name is used.
             db_path (str, optional): Path to the SQLite database file.
         """
-        super().__init__(agent_id, name or "Planning Agent")
+        super().__init__(agent_id, name or "Planning Agent", auto_save, is_debug)
         self.agent_type = "planning"
         self.current_plans = {}
 
