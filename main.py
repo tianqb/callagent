@@ -11,13 +11,13 @@ import json
 from app.database.db_manager import DatabaseManager
 from app.memory.short_term import ShortTermMemory
 from app.memory.long_term import LongTermMemory
-from app.communication.agent_hub import AgentHub
-from app.communication.conversation import ConversationManager
-from app.agents.agent_factory import AgentFactory
+from app.agents.agent_hub import AgentHub
+from app.database.conversation import ConversationManager
 from app.planning.task_planner import TaskPlanner
 from app.planning.plan_executor import PlanExecutor
 from app.utils.logger import Logger
 from app.utils.helpers import save_json, load_json, extract_task_steps
+from app.config import DATABASE_PATH
 
 
 def setup_database():
@@ -32,31 +32,7 @@ def setup_database():
     return db_manager
 
 
-def create_agents(db_path, agent_types=None):
-    """
-    Create agents.
-
-    Args:
-        db_path (str): Path to the SQLite database file.
-        agent_types (list, optional): List of agent types to create.
-
-    Returns:
-        tuple: (AgentFactory, dict) - Agent factory and dictionary of agent_id -> agent.
-    """
-    agent_factory = AgentFactory()
-    
-    if agent_types is None:
-        agent_types = ['research', 'planning', 'execution', 'critic']
-    
-    agents = {}
-    for agent_type in agent_types:
-        agent = agent_factory.create_agent(agent_type)
-        agents[agent.agent_id] = agent
-    
-    return agent_factory, agents
-
-
-def setup_agent_hub(agents):
+def setup_agent_hub():
     """
     Set up the agent hub.
 
@@ -68,6 +44,7 @@ def setup_agent_hub(agents):
         AgentHub: Agent hub.
     """
     agent_hub = AgentHub()
+    agents = agent_hub.create_team('main_task')
     
     for agent_id, agent in agents.items():
         agent_hub.register_agent(agent)
@@ -292,20 +269,18 @@ def main():
     db_manager = setup_database()
     logger.info(f"Database set up at {db_path}")
     
-    # Create agents
-    agent_factory, agents = create_agents(db_path, args.agent_types)
-    logger.info(f"Created {len(agents)} agents")
+
     
     # Set up the agent hub
-    agent_hub = setup_agent_hub(db_path, agents)
+    agent_hub = setup_agent_hub()
     logger.info("Agent hub set up")
     
     # Set up the task planner
-    task_planner = setup_task_planner(agent_hub, db_path)
+    task_planner = setup_task_planner(agent_hub)
     logger.info("Task planner set up")
     
     # Set up the plan executor
-    plan_executor = setup_plan_executor(agent_hub, db_path)
+    plan_executor = setup_plan_executor(agent_hub)
     logger.info("Plan executor set up")
     
     # Load state if specified
