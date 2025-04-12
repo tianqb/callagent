@@ -8,7 +8,6 @@ import argparse
 import time
 import json
 
-from app.config import DATABASE_PATH
 from app.database.db_manager import DatabaseManager
 from app.memory.short_term import ShortTermMemory
 from app.memory.long_term import LongTermMemory
@@ -28,7 +27,7 @@ def setup_database():
     Returns:
         DatabaseManager: Database manager.
     """
-    db_manager = DatabaseManager(DATABASE_PATH)
+    db_manager = DatabaseManager()
     db_manager.init_db()
     return db_manager
 
@@ -44,7 +43,7 @@ def create_agents(db_path, agent_types=None):
     Returns:
         tuple: (AgentFactory, dict) - Agent factory and dictionary of agent_id -> agent.
     """
-    agent_factory = AgentFactory(db_path)
+    agent_factory = AgentFactory()
     
     if agent_types is None:
         agent_types = ['research', 'planning', 'execution', 'critic']
@@ -57,7 +56,7 @@ def create_agents(db_path, agent_types=None):
     return agent_factory, agents
 
 
-def setup_agent_hub(db_path, agents):
+def setup_agent_hub(agents):
     """
     Set up the agent hub.
 
@@ -68,7 +67,7 @@ def setup_agent_hub(db_path, agents):
     Returns:
         AgentHub: Agent hub.
     """
-    agent_hub = AgentHub(db_path)
+    agent_hub = AgentHub()
     
     for agent_id, agent in agents.items():
         agent_hub.register_agent(agent)
@@ -82,7 +81,7 @@ def setup_agent_hub(db_path, agents):
     return agent_hub
 
 
-def setup_task_planner(agent_hub, db_path):
+def setup_task_planner(agent_hub):
     """
     Set up the task planner.
 
@@ -93,10 +92,10 @@ def setup_task_planner(agent_hub, db_path):
     Returns:
         TaskPlanner: Task planner.
     """
-    return TaskPlanner(agent_hub, db_path)
+    return TaskPlanner(agent_hub)
 
 
-def setup_plan_executor(agent_hub, db_path):
+def setup_plan_executor(agent_hub):
     """
     Set up the plan executor.
 
@@ -107,7 +106,7 @@ def setup_plan_executor(agent_hub, db_path):
     Returns:
         PlanExecutor: Plan executor.
     """
-    return PlanExecutor(agent_hub, db_path)
+    return PlanExecutor(agent_hub)
 
 
 def setup_logger():

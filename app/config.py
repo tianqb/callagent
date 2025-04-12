@@ -87,4 +87,25 @@ DEEPSEEK_API_KEY = config.get_config_value("deepseek", "api_key")
 DEEPSEEK_TEMPERATURE = config.get_config_value("deepseek", "temperature")
 
 # Memory configuration
-MEMORY_SHORT_TERM_TTL = config.get_config_value("memory", "short_term_memory_ttl", 3600)
+MEMORY_SHORT_TERM_TTL = config.get_config_value("memory", "short_term_ttl", 3600)
+
+# Sandbox configuration
+SANDBOX_USE = config.get_config_value("sandbox", "use_sandbox")
+SANDBOX_IMAGE = config.get_config_value("sandbox", "image")
+SANDBOX_WORK_DIR = config.get_config_value("sandbox", "work_dir")
+SANDBOX_MEMORY_LIMIT = config.get_config_value("sandbox", "memory_limit")
+SANDBOX_CPU_LIMIT = config.get_config_value("sandbox", "cpu_limit")
+SANDBOX_TIMEOUT = config.get_config_value("sandbox", "timeout")
+SANDBOX_NETWORK_ENABLED = config.get_config_value("sandbox", "network_enabled")
+
+# Search configuration
+# Search engine for agent to use. Default is "Google", can be set to "Baidu" or "DuckDuckGo".
+SEARCH_ENGINE = config.get_config_value("search", "engine")
+# Fallback engine order. Default is ["DuckDuckGo", "Baidu"] - will try in this order after primary engine fails.
+SEARCH_FALLBACK_ENGINES = config.get_config_value("search", "fallback_engines")
+# Seconds to wait before retrying all engines again when they all fail due to rate limits. Default is 60.
+SEARCH_RETRY_DELAY = config.get_config_value("search", "retry_delay")
+# Maximum number of times to retry all engines when all fail. Default is 3.
+SEARCH_MAX_RETRIES = config.get_config_value("search", "max_retries")
+SEARCH_LANG = config.get_config_value("search", "lang")
+SEARCH_COUNTRY = config.get_config_value("search", "country")

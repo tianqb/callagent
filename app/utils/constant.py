@@ -39,7 +39,7 @@ class AgentType(str, Enum):
     """Agent Type options"""
 
     BASE = "base"           #基础能力
-    #ADMIN = "admin"         #管理者
+    ##ADMIN = "admin"         #管理者
     RESEARCH = "research"   #探索
     PLANNING = "planning"   #规划
     EXECUTION = "execution" #执行

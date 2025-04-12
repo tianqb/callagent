@@ -450,17 +450,16 @@ CallAgent/
 ├── config.py                 # 配置文件
 ├── agents/
 │   ├── __init__.py
-│   ├── base_agent.py         # 基础智能体类
-│   ├── specialized_agent.py  # 特定领域智能体
-│   └── agent_factory.py      # 智能体工厂
+│   ├── base.py               # 基础智能体类
+│   ├── agent_hub.py          # 智能体中心（集成了智能体创建、通信和管理功能）
+│   ├── research.py           # 研究智能体
+│   ├── planning.py           # 规划智能体
+│   ├── execution.py          # 执行智能体
+│   └── critic.py             # 评价智能体
 ├── memory/
 │   ├── __init__.py
 │   ├── short_term.py         # 短期记忆实现
 │   └── long_term.py          # 长期记忆实现
-├── communication/
-│   ├── __init__.py
-│   ├── agent_hub.py          # 智能体通信中心
-│   └── conversation.py       # 对话管理
 ├── planning/
 │   ├── __init__.py
 │   ├── task_planner.py       # 任务规划
@@ -502,25 +501,22 @@ CallAgent/
    db_manager.init_db()
    ```
 
-3. 创建智能体：
+3. 创建智能体并设置通信：
    ```python
-   from agents.agent_factory import AgentFactory
+   from app.agents.agent_hub import AgentHub
    
-   agent_factory = AgentFactory('call_agent.db')
-   agent1 = agent_factory.create_agent('agent1', 'Research Agent')
-   agent2 = agent_factory.create_agent('agent2', 'Planning Agent')
+   # 创建AgentHub实例
+   hub = AgentHub()
+   
+   # 初始化团队
+   await hub.initialize_team()
+   
+   # 或者单独创建智能体
+   research_agent = hub.create_research_agent(name='Research Agent')
+   planning_agent = hub.create_planning_agent(name='Planning Agent')
    ```
 
-4. 设置智能体通信：
-   ```python
-   from communication.agent_hub import AgentHub
-   
-   hub = AgentHub('call_agent.db')
-   hub.register_agent(agent1)
-   hub.register_agent(agent2)
-   ```
-
-5. 创建和执行任务：
+4. 创建和执行任务：
    ```python
    from planning.task_planner import TaskPlanner
    

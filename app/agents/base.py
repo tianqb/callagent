@@ -7,7 +7,7 @@ import json
 import time
 from app.memory.short_term import ShortTermMemory
 from app.memory.long_term import LongTermMemory
-from app.config import SHORT_TERM_TTL,DATABASE_PATH,DEEPSEEK_MODEL,DEEPSEEK_BASE_URL,DEEPSEEK_API_KEY
+from app.config import MEMORY_SHORT_TERM_TTL,DEEPSEEK_MODEL,DEEPSEEK_BASE_URL,DEEPSEEK_API_KEY
 from pydantic import Field
 from Agently.Agent.Agent import Agent
 from Agently.utils import PluginManager, ToolManager, RuntimeCtx
@@ -27,7 +27,7 @@ class BaseAgent(Agent):
             name (str, optional): Name of the agent. If None, a default name is used.
             db_path (str, optional): Path to the SQLite database file.
         """
-        super().__init__(agent_id=agent_id, auto_save=auto_save, parent_agent_runtime_ctx=RuntimeCtx(), parent_tool_manager=ToolManager(parent = global_tool_manager), global_storage=global_storage, parent_plugin_manager=PluginManager(parent = global_plugin_manager), parent_settings=RuntimeCtx(parent = global_settings), is_debug=is_debug)
+        super().__init__(agent_id=agent_id, auto_save=auto_save, parent_agent_runtime_ctx=RuntimeCtx(), parent_tool_manager=global_tool_manager, global_storage=global_storage, parent_plugin_manager=global_plugin_manager, parent_settings=global_settings, is_debug=is_debug)
         #####设置模型相关参数######
         ## 将默认模型请求客户端设置为OAIClient（我们为OpenAI兼容格式定制的请求客户端）
         self.set_settings("current_model", "OAIClient")
@@ -40,7 +40,7 @@ class BaseAgent(Agent):
         
         self.agent_id: str = agent_id or f"agent_{uuid.uuid4().hex[:8]}"
         self.name: str = name or f"Agent-{self.agent_id}"
-        self.short_term_memory = ShortTermMemory(cleanup_interval = SHORT_TERM_TTL)
+        self.short_term_memory = ShortTermMemory(cleanup_interval = MEMORY_SHORT_TERM_TTL)
         self.long_term_memory = LongTermMemory()
         self.created_at: float = time.time()
 
@@ -79,7 +79,7 @@ class BaseAgent(Agent):
                 "message": message,
                 "timestamp": time.time()
             },
-            ttl=SHORT_TERM_MEMORY_TTL
+            ttl=MEMORY_SHORT_TERM_TTL
         )
 
         # Process the message
@@ -94,7 +94,7 @@ class BaseAgent(Agent):
                 "message": response,
                 "timestamp": time.time()
             },
-            ttl=SHORT_TERM_MEMORY_TTL
+            ttl=MEMORY_SHORT_TERM_TTL
         )
 
         # Store the conversation in long-term memory if available

@@ -1,5 +1,6 @@
 from app.agents.base import BaseAgent
 import time
+from app.utils.constant import AgentType
 
 class CriticAgent(BaseAgent):
     """
@@ -16,7 +17,7 @@ class CriticAgent(BaseAgent):
             db_path (str, optional): Path to the SQLite database file.
         """
         super().__init__(agent_id, name or "Critic Agent", auto_save, is_debug)
-        self.agent_type = "critic"
+        self.agent_type = AgentType.CRITIC
         self.evaluations = {}
         
 
@@ -88,7 +89,7 @@ class CriticAgent(BaseAgent):
         """
         # In a real implementation, this would use the Agently framework to generate an evaluation
         eval_id = f"eval_{int(time.time())}"
-        
+        #标准->[准确、完整、清晰]
         if criteria is None:
             criteria = ["accuracy", "completeness", "clarity"]
         

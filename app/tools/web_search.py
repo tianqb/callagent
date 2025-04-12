@@ -1,12 +1,12 @@
 import asyncio
 from typing import Any, Dict, List, Optional
 
+from app.config import SEARCH_MAX_RETRIES,SEARCH_RETRY_DELAY,SEARCH_LANG,SEARCH_COUNTRY,SEARCH_ENGINE,SEARCH_FALLBACK_ENGINES
 import requests
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from app.config import config
 from app.utils.logger import Logger
 from app.tools.base import BaseTool, ToolResult
 from app.tools.search import (
@@ -18,7 +18,7 @@ from app.tools.search import (
 )
 from app.tools.search.base import SearchItem
 
-
+logger = Logger("web_search")
 class SearchResult(BaseModel):
     """Represents a single search result returned by a search engine."""
 
@@ -129,7 +129,7 @@ class WebContentFetcher:
             )
 
             if response.status_code != 200:
-                Logger.warning(
+                logger.warning(
                     f"Failed to fetch content from {url}: HTTP {response.status_code}"
                 )
                 return None
@@ -149,7 +149,7 @@ class WebContentFetcher:
             return text[:10000] if text else None
 
         except Exception as e:
-            Logger.warning(f"Error fetching content from {url}: {e}")
+            logger.warning(f"Error fetching content from {url}: {e}")
             return None
 
 
@@ -220,31 +220,15 @@ class WebSearch(BaseTool):
             A structured response containing search results and metadata
         """
         # Get settings from config
-        retry_delay = (
-            getattr(config.search_config, "retry_delay", 60)
-            if config.search_config
-            else 60
-        )
-        max_retries = (
-            getattr(config.search_config, "max_retries", 3)
-            if config.search_config
-            else 3
-        )
+        retry_delay = (SEARCH_RETRY_DELAY if SEARCH_RETRY_DELAY else 60)
+        max_retries = (SEARCH_MAX_RETRIES if SEARCH_MAX_RETRIES else 3)
 
         # Use config values for lang and country if not specified
         if lang is None:
-            lang = (
-                getattr(config.search_config, "lang", "en")
-                if config.search_config
-                else "en"
-            )
+            lang = (SEARCH_LANG if SEARCH_LANG else "en")
 
         if country is None:
-            country = (
-                getattr(config.search_config, "country", "us")
-                if config.search_config
-                else "us"
-            )
+            country = (SEARCH_COUNTRY if SEARCH_LANG else "us")
 
         search_params = {"lang": lang, "country": country}
 
@@ -271,12 +255,12 @@ class WebSearch(BaseTool):
 
             if retry_count < max_retries:
                 # All engines failed, wait and retry
-                Logger.warning(
+                logger.warning(
                     f"All search engines failed. Waiting {retry_delay} seconds before retry {retry_count + 1}/{max_retries}..."
                 )
                 await asyncio.sleep(retry_delay)
             else:
-                Logger.error(
+                logger.error(
                     f"All search engines failed after {max_retries} retries. Giving up."
                 )
 
@@ -296,7 +280,7 @@ class WebSearch(BaseTool):
 
         for engine_name in engine_order:
             engine = self._search_engine[engine_name]
-            Logger.info(f"🔎 Attempting search with {engine_name.capitalize()}...")
+            logger.info(f"🔎 Attempting search with {engine_name.capitalize()}...")
             search_items = await self._perform_search_with_engine(
                 engine, query, num_results, search_params
             )
@@ -305,7 +289,7 @@ class WebSearch(BaseTool):
                 continue
 
             if failed_engines:
-                Logger.info(
+                logger.info(
                     f"Search successful with {engine_name.capitalize()} after trying: {', '.join(failed_engines)}"
                 )
 
@@ -323,7 +307,7 @@ class WebSearch(BaseTool):
             ]
 
         if failed_engines:
-            Logger.error(f"All search engines failed: {', '.join(failed_engines)}")
+            logger.error(f"All search engines failed: {', '.join(failed_engines)}")
         return []
 
     async def _fetch_content_for_results(
@@ -359,16 +343,10 @@ class WebSearch(BaseTool):
 
     def _get_engine_order(self) -> List[str]:
         """Determines the order in which to try search engines."""
-        preferred = (
-            getattr(config.search_config, "engine", "google").lower()
-            if config.search_config
-            else "google"
-        )
+        preferred = (SEARCH_ENGINE.lower() if SEARCH_ENGINE else "google")
+        SEARCH_FALLBACK_ENGINES = ["DuckDuckGo", "Baidu"]
         fallbacks = (
-            [engine.lower() for engine in config.search_config.fallback_engines]
-            if config.search_config
-            and hasattr(config.search_config, "fallback_engines")
-            else []
+            [engine.lower() for engine in SEARCH_FALLBACK_ENGINES]
         )
 
         # Start with preferred engine, then fallbacks, then remaining engines
@@ -408,11 +386,32 @@ class WebSearch(BaseTool):
         )
 
 
-if __name__ == "__main__":
-    web_search = WebSearch()
-    search_response = asyncio.run(
-        web_search.execute(
-            query="Python programming", fetch_content=True, num_results=1
+web_search = WebSearch()
+web_search_tool_info = {
+    "tool_name": "web_search",
+    "desc": "执行网络搜索",
+    "args": {
+        "query": (
+            "str",
+            "[*Required] 搜索查询"
+        ),
+        "fetch_content":(
+            "bool",
+            "是否获取搜索结果的完整内容（默认: false）"
+        ),
+        "num_results":(
+            "int",
+            "返回结果数量（默认: 5）"
         )
-    )
-    print(search_response.to_tool_result())
+    },
+    "func": web_search.execute
+}
+
+# if __name__ == "__main__":
+#     web_search = WebSearch()
+#     search_response = asyncio.run(
+#         web_search.execute(
+#             query="Python programming", fetch_content=True, num_results=1
+#         )
+#     )
+#     print(search_response.to_tool_result())

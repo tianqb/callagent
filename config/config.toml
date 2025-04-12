@@ -2,19 +2,36 @@
 [deepseek]
 model = "deepseek-chat"                                 # The LLM model to use
 base_url = "https://api.deepseek.com/v1/"               # API endpoint URL
-api_key = "Your api key"                                # Your API key                                    
+api_key = "sk-b780601045ba4e3cb2e49cda0e84c739"         # Your API key                                    
 temperature = 0.7                                       # Controls randomness
 
 ## Sandbox configuration
-#[sandbox]
-#use_sandbox = false
-#image = "python:3.12-slim"
-#work_dir = "/workspace"
-#memory_limit = "1g"  # 512m
-#cpu_limit = 2.0
-#timeout = 300
-#network_enabled = true
+[sandbox]
+use_sandbox = false
+image = "python:3.12-slim"
+work_dir = "/workspace"
+memory_limit = "1g"  # 512m
+cpu_limit = 2.0
+timeout = 300
+network_enabled = true
 
 ## Memory configuration
-#[memory]
-short_term_memory_ttl = 3600  # 1 hour in seconds
+[memory]
+short_term_ttl = 3600  # 1 hour in seconds
+
+# Optional configuration, Search settings.
+[search]
+# Search engine for agent to use. Default is "Google", can be set to "Baidu" or "DuckDuckGo".
+engine = "Baidu"
+# Seconds to wait before retrying all engines again when they all fail due to rate limits. Default is 60.
+retry_delay = 60
+# Maximum number of times to retry all engines when all fail. Default is 3.
+max_retries = 3
+####
+#lang = zh_CN
+##
+#country = cn
+# Fallback engine order. Default is ["DuckDuckGo", "Baidu"] - will try in this order after primary engine fails.
+#fallback_engines = ["DuckDuckGo", "Baidu"]
+
+

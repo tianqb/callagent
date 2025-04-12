@@ -1,9 +1,10 @@
 ### Project-specific ###
 # Logs
 logs/
-
+tests/
 # Data
 data/
+config/
 
 # Workspace
 workspace/
@@ -198,3 +199,4 @@ cython_debug/
 # OSX
 .DS_Store
 *.db
+*.toml

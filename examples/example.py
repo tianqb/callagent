@@ -8,8 +8,7 @@ sys.path.append(BASE_DIR)
 import time
 from app.config import DATABASE_PATH
 from app.database.db_manager import DatabaseManager
-from app.communication.agent_hub import AgentHub
-from app.agents.agent_factory import AgentFactory
+from app.agents.agent_hub import AgentHub
 from app.planning.task_planner import TaskPlanner
 from app.planning.plan_executor import PlanExecutor
 from app.utils.logger import Logger
@@ -28,43 +27,34 @@ def main():
     db_manager.init_db()
     logger.info(f"Database set up at {DATABASE_PATH}")
     
-    # Create agents
-    agent_factory = AgentFactory()
+    # Set up the agent hub
+    agent_hub = AgentHub()
     
     # Create a research agent
-    research_agent = agent_factory.create_research_agent(
+    research_agent = agent_hub.create_research_agent(
         name="Research Agent",
         expertise=["artificial intelligence", "machine learning", "data analysis"]
     )
     logger.info(f"Created research agent: {research_agent.agent_id}")
     
     # Create a planning agent
-    planning_agent = agent_factory.create_planning_agent(
+    planning_agent = agent_hub.create_planning_agent(
         name="Planning Agent"
     )
     logger.info(f"Created planning agent: {planning_agent.agent_id}")
     
     # Create an execution agent
-    execution_agent = agent_factory.create_execution_agent(
+    execution_agent = agent_hub.create_execution_agent(
         name="Execution Agent",
         skills=["coding", "data processing", "report generation"]
     )
     logger.info(f"Created execution agent: {execution_agent.agent_id}")
     
     # Create a critic agent
-    critic_agent = agent_factory.create_critic_agent(
+    critic_agent = agent_hub.create_critic_agent(
         name="Critic Agent"
     )
     logger.info(f"Created critic agent: {critic_agent.agent_id}")
-    
-    # Set up the agent hub
-    agent_hub = AgentHub()
-    
-    # Register agents with the hub
-    agent_hub.register_agent(research_agent)
-    agent_hub.register_agent(planning_agent)
-    agent_hub.register_agent(execution_agent)
-    agent_hub.register_agent(critic_agent)
     logger.info("Registered agents with the hub")
     
     # Override the send_message method of each agent to use the agent hub
